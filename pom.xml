@@ -13,8 +13,9 @@
   <version>0.0.1-SNAPSHOT</version>
 
   <name>suffix tree</name>
-  <description>Generalized suffix tree implementation.</description>
+  <description>Suffix tree implementation.</description>
   <inceptionYear>2008</inceptionYear>
+  <url>https://github.com/performantdata/suffixtree</url>
   <organization>
     <name>Performant Data LLC</name>
     <url>http://performantdata.com</url>
@@ -26,10 +27,17 @@
       <timezone>America/Los_Angeles</timezone>
     </developer>
   </developers>
+  <scm>
+    <url>https://github.com/performantdata/suffixtree</url>
+    <connection>scm:git:https://github.com/performantdata/suffixtree.git</connection>
+  </scm>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/performantdata/suffixtree/issues</url>
+  </issueManagement>
 
   <properties>
     <scala.version>2.11.7</scala.version>
-    <javac.version>1.8</javac.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -52,12 +60,6 @@
       <version>2.2.5</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
@@ -69,6 +71,11 @@
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>2.8</version>
         </plugin>
@@ -78,21 +85,85 @@
           <version>3.4</version>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.18.1</version>
+        </plugin>
+        <plugin>
           <groupId>net.alchim31.maven</groupId>
           <artifactId>scala-maven-plugin</artifactId>
           <version>3.2.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.scalatest</groupId>
+          <artifactId>scalatest-maven-plugin</artifactId>
+          <version>1.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
 
     <plugins>
+      <!-- Disable the Maven Java compiler and Surefire tests. -->
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
+        <executions>
+          <execution>
+            <id>default-compile</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>default-testCompile</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-test</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>scala-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>testCompile</goal>
+            </goals>
+            <configuration>
+              <args>
+                <arg>-deprecation</arg>
+                <arg>-explaintypes</arg>
+                <arg>-feature</arg>
+                <arg>-unchecked</arg>
+              </args>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- From http://scalatest.org/user_guide/using_the_scalatest_maven_plugin -->
+      <plugin>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest-maven-plugin</artifactId>
         <configuration>
-          <source>${javac.version}</source>
-          <target>${javac.version}</target>
+          <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+          <junitxml>.</junitxml>
+          <filereports>WDF TestSuite.txt</filereports>
         </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

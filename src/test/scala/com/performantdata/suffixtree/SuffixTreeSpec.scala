@@ -3,12 +3,9 @@
  */
 package com.performantdata.suffixtree
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import scala.util.Random
 
 /** Test of the suffix tree. */
-@RunWith(classOf[JUnitRunner])
 class SuffixTreeSpec extends UnitSpec {
   val alphabet = new NucleotideAlphabet()
 
