@@ -1,3 +1,6 @@
+/*
+ * Copyright © 2015 Performant Data LLC. All rights reserved.
+ */
 package com.performantdata.suffixtree
 
 /** A root node of a suffix tree.
