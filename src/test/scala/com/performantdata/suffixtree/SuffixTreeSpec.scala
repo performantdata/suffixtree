@@ -85,6 +85,5 @@ class SuffixTreeSpec extends UnitSpec {
     out.println( ClassLayout.parseClass(classOf[Array[HashEntry[Char,_]]]).toPrintable(tree) )
     out.println( ClassLayout.parseClass(classOf[DefaultEntry[Char,_]]).toPrintable(tree) )
     out.println( ClassLayout.parseClass(classOf[InternalNode[_]]).toPrintable(tree) )
-    out.println( ClassLayout.parseClass(classOf[HashMap[_,_]]).toPrintable(tree) )
   }
 }
