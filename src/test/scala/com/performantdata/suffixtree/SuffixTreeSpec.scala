@@ -3,7 +3,12 @@
  */
 package com.performantdata.suffixtree
 
+import scala.io.Source
 import scala.util.Random
+import java.util.zip.GZIPInputStream
+import scala.collection.mutable.HashEntry
+import scala.collection.mutable.DefaultEntry
+import scala.collection.mutable.HashMap
 
 /** Test of the suffix tree. */
 class SuffixTreeSpec extends UnitSpec {
@@ -54,5 +59,32 @@ class SuffixTreeSpec extends UnitSpec {
     val stream = new Random(seed).alphanumeric
     val tree = SuffixTree(alphabet) += stream.take(1000000).toIndexedSeq
     tree.terminate()
+  }
+
+  it should "use memory?" in {
+    import System.out
+    import org.openjdk.jol.info.{ClassLayout,GraphLayout}
+    import org.openjdk.jol.util.VMSupport
+
+    val tree = SuffixTree(alphabet)
+    val is = getClass.getClassLoader.getResourceAsStream("dm6.fa.gz")
+    assume(is != null, "Test data file not available.")
+    try {
+      val stream = Source.fromInputStream(new GZIPInputStream(is))
+      for (line <- stream.getLines().take(10000) if !line.startsWith(">"))
+        tree += line.toUpperCase
+    }
+    finally {
+      is.close()
+    }
+    tree.terminate()
+
+    System.gc()
+    out.println( VMSupport.vmDetails() )
+    out.println( GraphLayout.parseInstance(tree).toFootprint() )
+    out.println( ClassLayout.parseClass(classOf[Array[HashEntry[Char,_]]]).toPrintable(tree) )
+    out.println( ClassLayout.parseClass(classOf[DefaultEntry[Char,_]]).toPrintable(tree) )
+    out.println( ClassLayout.parseClass(classOf[InternalNode[_]]).toPrintable(tree) )
+    out.println( ClassLayout.parseClass(classOf[HashMap[_,_]]).toPrintable(tree) )
   }
 }
