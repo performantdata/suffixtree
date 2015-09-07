@@ -1,0 +1,3 @@
+# FASTA files
+*.fasta
+*.fa.gz
