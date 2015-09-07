@@ -195,7 +195,7 @@ class SuffixTree[A <: Alphabet] private (alphabet: A) extends LazyLogging {
     */
   private[this] def doPhase() {
     assert(phase > 0) // the first implicit tree already exists
-    if (phase % 1024 == 0) logger.debug("Starting phase " + phase + ".")
+    if (phase % 16384 == 0) logger.info("Starting phase " + phase + ".")
 
     // Initialize SEA.
     newInternalNode = null
