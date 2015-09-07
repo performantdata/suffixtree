@@ -10,7 +10,7 @@
 
   <groupId>com.performantdata</groupId>
   <artifactId>suffixtree</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
 
   <name>suffix tree</name>
   <description>Suffix tree implementation.</description>
