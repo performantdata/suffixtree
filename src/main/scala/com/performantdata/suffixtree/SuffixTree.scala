@@ -8,6 +8,7 @@ import scala.collection.mutable.Buffer
 import com.typesafe.scalalogging.LazyLogging
 import scala.util.control.Breaks
 import scala.annotation.tailrec
+import scala.reflect.ClassTag
 
 /** Suffix tree.
   * 
@@ -37,7 +38,7 @@ import scala.annotation.tailrec
   * @param alphabet Alphabet of the string symbols.
   * @throws IllegalArgumentException if the string is empty or contains a terminator symbol
   */
-class SuffixTree[A <: Alphabet] private (alphabet: A) extends LazyLogging {
+class SuffixTree[A <: Alphabet] private (alphabet: A)(implicit tag: ClassTag[A#Internal]) extends LazyLogging {
   private[this] val myBreaks = new Breaks
   import myBreaks.{break, breakable}
 
@@ -397,7 +398,7 @@ class SuffixTree[A <: Alphabet] private (alphabet: A) extends LazyLogging {
         "\",fontcolor=blue,shape=plaintext];\n" +
         "\"lastEndPosition\" -> \"" + nodeLabel + "\" [style=bold,color=blue];\n")
 
-    for (child <- node.children.values) {
+    for (child <- node.values) {
       val size = storedString.length
       val length = child match {
         case n: Leaf[I] => n.length(phase)
@@ -441,5 +442,6 @@ object SuffixTree {
     * tree.terminate()
     * }}}
     */
-  def apply[A <: Alphabet](alphabet: A): SuffixTree[A] = new SuffixTree[A](alphabet)
+  def apply[A <: Alphabet](alphabet: A)(implicit tag: ClassTag[A#Internal]): SuffixTree[A] =
+    new SuffixTree[A](alphabet)
 }

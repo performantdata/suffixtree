@@ -3,6 +3,8 @@
  */
 package com.performantdata.suffixtree
 
+import scala.reflect.ClassTag
+
 /** A root node of a suffix tree.
   * 
   * I follow the usual convention that a root node is an internal node, for ease of implementation,
@@ -10,7 +12,7 @@ package com.performantdata.suffixtree
   * 
   * @tparam I Type of the internal representation of a symbol.
   */
-final class RootNode[I] private extends InternalNode[I](null, 0, 0) {
+final class RootNode[I: ClassTag] private extends InternalNode[I](null, 0, 0) {
   /** Return the length of the label of the edge leading from the parent to this node.
     * Always returns 0 for the root node.
     */
@@ -27,5 +29,5 @@ object RootNode {
     * 
     * @tparam I Type of the internal representation of a symbol.
     */
-  def apply[I]() = new RootNode[I]
+  def apply[I: ClassTag]() = new RootNode[I]
 }

@@ -3,9 +3,8 @@
  */
 package com.performantdata.suffixtree;
 
-import scala.collection._
-import scala.collection.mutable.HashTable
-import scala.collection.mutable.DefaultEntry
+import debox.Map
+import scala.reflect.ClassTag
 
 
 /** Internal node of a suffix tree.
@@ -17,13 +16,13 @@ import scala.collection.mutable.DefaultEntry
   * @param _edgeEnd One after the ending position, in the string, of the edge label. Set to `0` for the root node.
   */
 class InternalNode[I] protected[suffixtree] (_parent : InternalNode[I], _edgeStart : Int, _edgeEnd : Int)
+  (implicit ev: ClassTag[I])
   extends Node[I](_parent, _edgeStart)
-  with HashTable[I, DefaultEntry[I, Node[I]]]  // Holds the child nodes of this node, keyed by the first element of their label.
 {
   assert(_edgeEnd >= _edgeStart, "Edge length must be non-negative.")
 
-  protected def createNewEntry[B1](key: I, value: B1): DefaultEntry[I, Node[I]] =
-    new DefaultEntry(key, value.asInstanceOf[Node[I]])
+  /** Child nodes of this node, keyed by the first element of their label. */
+  private[this] val childrenByElement: Map[I, Node[_]] = Map.empty[I, Node[_]](ev, nodeClassTag)
 
   /** Suffix link, if any, from this node. */
   private[this] var _suffixLink: InternalNode[I] = null
@@ -50,8 +49,8 @@ class InternalNode[I] protected[suffixtree] (_parent : InternalNode[I], _edgeSta
   private[suffixtree]
   def addLeaf(element: I, startIndex: Int, number: Int): Leaf[I] = {
     val newLeaf = Leaf[I](this, startIndex, number)
-    val e = findOrAddEntry(element, newLeaf)
-    assert(e == null)
+    assert(!childrenByElement.contains(element))
+    childrenByElement(element) = newLeaf
     newLeaf
   }
 
@@ -59,14 +58,11 @@ class InternalNode[I] protected[suffixtree] (_parent : InternalNode[I], _edgeSta
     * @return `null` if there is no such child
     */
   private[suffixtree]
-  def child(element: I): Node[I] = {
-    val result = findEntry(element)
-    if (result eq null) null else result.value
-  }
+  def child(element: I): Node[I] = childrenByElement(element).asInstanceOf[Node[I]]
 
   /** Tests whether there is a the child node whose edge label starts with the given element. */
   private[suffixtree]
-  def hasChild(element: I): Boolean = findEntry(element) != null
+  def hasChild(element: I): Boolean = childrenByElement.contains(element)
 
   /** Add a child node.
     * 
@@ -75,23 +71,22 @@ class InternalNode[I] protected[suffixtree] (_parent : InternalNode[I], _edgeSta
   private[suffixtree]
   def put(kv: (I, Node[I])): Option[Node[I]] = {
     assert(kv._2 != this)
-    val e = findOrAddEntry(kv._1, kv._2)
-    if (e eq null) None
-    else { val v = e.value; e.value = kv._2; Some(v) }
+    val oldNode = childrenByElement.get(kv._1)
+    childrenByElement(kv._1) = kv._2
+    oldNode.asInstanceOf[Option[Node[I]]]
   }
 
-  /** An unmodifiable map of this node's children,
-    * keyed by the first character of the label on the edge leading to the child.
+  /** Applies a function to all elements of this node's map.
     * 
-    * The underlying map may change if the suffix tree is modified.
+    * @param f A function taking a pair of:
+    *   (1) the first character on an edge leading to a child node,
+    *   (2) the child node on that edge.
     */
-  def children: scala.collection.Map[I, Node[I]] = {
-    val arr = new Array[(I, Node[I])](tableSize)
-    var i = 0
-    foreachEntry { e => arr(i) = (e.key, e.value); i += 1 }
+  def foreach(f: ((I, Node[I])) => Unit): Unit =
+    childrenByElement.foreach((k,v) => f((k,v.asInstanceOf[Node[I]])))
 
-    Map(arr: _*)
-  }
+  /** The child nodes of this node. */
+  def values: Iterable[Node[I]] = childrenByElement.valuesArray.asInstanceOf[Array[Node[I]]]
 
   /** Return whether this node has a suffix link from it. */
   private[suffixtree]
@@ -110,7 +105,7 @@ object InternalNode {
     * @param edgeStart Starting position, in the string, of the edge label.
     * @param edgeLength Number of characters on the edge from the parent node to this node.
     */
-  def apply[I](parent: InternalNode[I], edgeStart: Int, edgeLength: Int): InternalNode[I] = {
+  def apply[I: ClassTag](parent: InternalNode[I], edgeStart: Int, edgeLength: Int): InternalNode[I] = {
     assert(parent != null, "Parent reference cannot be empty.")
     assert(edgeStart >= 0, "Edge start must be non-negative.")
     assert(edgeLength > 0, "Length must be positive.")

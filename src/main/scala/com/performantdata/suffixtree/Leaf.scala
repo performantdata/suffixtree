@@ -3,19 +3,15 @@
  */
 package com.performantdata.suffixtree;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 /** Leaf node of a suffix tree. 
   * 
   * @constructor Create a node with the given parent and edge label indices.
   * @param _edgeStart The start index of the leaf's edge label, in the tree's string.
   * @param stringStart The starting position, in the given string, of the suffix that ends at this leaf.
   */
-final class Leaf[T] private (_parent: InternalNode[T], _edgeStart: Int, val stringStart: Int) extends Node[T](_parent, _edgeStart) {
+final class Leaf[I] private (_parent: InternalNode[I], _edgeStart: Int, val stringStart: Int)
+  extends Node[I](_parent, _edgeStart)
+{
   assert(_parent != null && _edgeStart >= 0 && stringStart >= 0)
 
   /** Return the length, as of the end of the given phase, of the edge to this node (from its parent node).

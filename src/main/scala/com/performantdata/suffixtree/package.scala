@@ -7,4 +7,6 @@ package com.performantdata
   * 
   * The main class is [[SuffixTree]].
   */
-package object suffixtree {}
+package object suffixtree {
+  private[suffixtree] implicit val nodeClassTag = scala.reflect.classTag[Node[_]]
+}

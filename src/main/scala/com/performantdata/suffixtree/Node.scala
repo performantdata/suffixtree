@@ -3,7 +3,7 @@
  */
 package com.performantdata.suffixtree;
 
-import java.util.List;
+import scala.reflect.ClassTag
 
 /** Node of a suffix tree.
   *
@@ -16,7 +16,10 @@ import java.util.List;
   * @param parent Parent node. Set to `null` for the root node.
   * @param _edgeStart Starting position, in the string, of the edge label. Set to `0` for the root node.
   */
-abstract class Node[T] protected[suffixtree] (private[suffixtree] var parent: InternalNode[T], private[this] var _edgeStart: Int) {
+abstract class Node[T] protected[suffixtree] (
+  private[suffixtree] var parent: InternalNode[T],
+  private[this] var _edgeStart: Int
+) {
   assert(_edgeStart >= 0)
 
   /** Starting position, in the string, of the edge label.
@@ -45,7 +48,7 @@ abstract class Node[T] protected[suffixtree] (private[suffixtree] var parent: In
     * @return the new node that splits the edge
     */
   private[suffixtree]
-  def split(firstEdgeChar: T, nextEdgeChar: T, edgeLength: Int): InternalNode[T] = {
+  def split(firstEdgeChar: T, nextEdgeChar: T, edgeLength: Int)(implicit ev: ClassTag[T]): InternalNode[T] = {
     assert(edgeLength > 0)
 
     // TODO Should I retain the indexing of the child node string instead?
