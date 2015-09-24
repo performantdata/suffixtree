@@ -53,8 +53,13 @@ class SuffixTree[A <: Alphabet] private (alphabet: A)(implicit tag: ClassTag[A#I
   /** Concatenation of all of the appended strings. */
   private[this] val storedString: Buffer[I] = ArrayBuffer()
 
+  /** Child nodes, keyed by the internal node and the first element of their label. */
+  private[this] val children = new TwoKeyOpenHashMap[InternalNode[I], I, Node[I]](100000, alphabet.size) {
+    override def default(k1: InternalNode[I], k2: I) = null
+  }
+
   /** Root node. */
-  private[this] val _root = RootNode[I]
+  private[this] val _root = RootNode(children)
 
   /** The (zero-based) `extension` number at which to start the phase.
     * In Gusfield's notation, this would equal ''j,,i,,'' (allowing for the zero-basing) in phase ''i''+1.
@@ -79,7 +84,7 @@ class SuffixTree[A <: Alphabet] private (alphabet: A)(implicit tag: ClassTag[A#I
     * the current string is either empty, or already terminated.
     * These conditions can be distinguished by whether `phase == 0`.
     */
-  private[this] var element: I = alphabet.terminalSymbol // dummy value for initialization
+  private[this] var element: I = alphabet.sentinel // dummy value for initialization
 
   /** Whether the string has been terminated. */
   private[this] var isTerminated = false
@@ -116,7 +121,7 @@ class SuffixTree[A <: Alphabet] private (alphabet: A)(implicit tag: ClassTag[A#I
     if (string != null && !string.isEmpty)
       string.foreach { character =>
         element = alphabet.convert(character)
-        require(element != alphabet.terminalSymbol,
+        require(element != alphabet.sentinel,
           "Disallowed terminal symbol found at position " + (phase + 1 /* because it hasn't been incremented yet */) + ".")
         addSymbol()
       }
@@ -134,7 +139,7 @@ class SuffixTree[A <: Alphabet] private (alphabet: A)(implicit tag: ClassTag[A#I
     if (isTerminated)
       throw new IllegalStateException("The current string has already been terminated.")
 
-    element = alphabet.terminalSymbol
+    element = alphabet.sentinel
     isTerminated = true
     if (!storedString.isEmpty) {
       // Start the extensions from the beginning, since we're only now adding this symbol to the string.
@@ -207,7 +212,7 @@ class SuffixTree[A <: Alphabet] private (alphabet: A)(implicit tag: ClassTag[A#I
      */
 
     // Don't add the termination symbol alone as a suffix.
-    val lastExtension = if (element == alphabet.terminalSymbol) phase - 1 else phase
+    val lastExtension = if (element == alphabet.sentinel) phase - 1 else phase
 
     var rule3 = false
     breakable {
@@ -351,7 +356,7 @@ class SuffixTree[A <: Alphabet] private (alphabet: A)(implicit tag: ClassTag[A#I
 
     if (element != nextEdgeChar) {  // suffix extension Rule 2b
       val firstEdgeChar = storedString(child.edgeStart)
-      val newNode = child.split(firstEdgeChar, nextEdgeChar, pathLength)
+      val newNode = child.split(firstEdgeChar, nextEdgeChar, pathLength, children)
       newNode.addLeaf(element, phase, extension)
 
       lastEnd = newNode

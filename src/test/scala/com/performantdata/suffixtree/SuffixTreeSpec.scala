@@ -82,6 +82,7 @@ class SuffixTreeSpec extends UnitSpec {
     System.gc()
     out.println( VMSupport.vmDetails() )
     out.println( GraphLayout.parseInstance(tree).toFootprint() )
-    out.println( ClassLayout.parseClass(classOf[InternalNode[_]]).toPrintable(tree) )
+    out.println( ClassLayout.parseClass(classOf[InternalNode[_]]).toPrintable() )
+    out.println( ClassLayout.parseClass(classOf[TwoKeyOpenHashMap[InternalNode[Char], Char, Node[Char]]]).toPrintable() )
   }
 }

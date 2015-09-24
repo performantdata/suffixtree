@@ -10,7 +10,7 @@
 
   <groupId>com.performantdata</groupId>
   <artifactId>suffixtree</artifactId>
-  <version>0.0.3</version>
+  <version>0.0.4</version>
 
   <name>suffix tree</name>
   <description>Suffix tree implementation.</description>
@@ -49,11 +49,6 @@
       <version>${scala.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.spire-math</groupId>
-      <artifactId>debox_2.11</artifactId>
-      <version>0.7.3</version>
-    </dependency>
     <dependency>
       <groupId>com.typesafe.scala-logging</groupId>
       <artifactId>scala-logging_2.11</artifactId>

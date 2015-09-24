@@ -3,8 +3,6 @@
  */
 package com.performantdata.suffixtree;
 
-import scala.reflect.ClassTag
-
 /** Node of a suffix tree.
   *
   * A node also encapsulates the edge leading to it from its parent.
@@ -16,8 +14,8 @@ import scala.reflect.ClassTag
   * @param parent Parent node. Set to `null` for the root node.
   * @param _edgeStart Starting position, in the string, of the edge label. Set to `0` for the root node.
   */
-abstract class Node[T] protected[suffixtree] (
-  private[suffixtree] var parent: InternalNode[T],
+abstract class Node[I] protected[suffixtree] (
+  private[suffixtree] var parent: InternalNode[I],
   private[this] var _edgeStart: Int
 ) {
   assert(_edgeStart >= 0)
@@ -45,14 +43,21 @@ abstract class Node[T] protected[suffixtree] (
     * @param edgeLength
     *   The length of the edge leading to the new node.
     *   No check is made to insure that this is less than the length of the existing edge.
+    * @param children
+    *   Child nodes, keyed by the internal node and the first element of their label.
     * @return the new node that splits the edge
     */
   private[suffixtree]
-  def split(firstEdgeChar: T, nextEdgeChar: T, edgeLength: Int)(implicit ev: ClassTag[T]): InternalNode[T] = {
+  def split(
+    firstEdgeChar: I,
+    nextEdgeChar: I,
+    edgeLength: Int,
+    children: TwoKeyOpenHashMap[InternalNode[I], I, Node[I]]
+  ): InternalNode[I] = {
     assert(edgeLength > 0)
 
     // TODO Should I retain the indexing of the child node string instead?
-    val newNode = InternalNode[T](parent, _edgeStart, edgeLength)
+    val newNode = InternalNode[I](parent, children, _edgeStart, edgeLength)
     val oldNode = parent.put(firstEdgeChar, newNode) // replaces this node in the parent's children
     assert(oldNode.get == this)
 

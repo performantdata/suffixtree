@@ -7,6 +7,7 @@ package com.performantdata.suffixtree
 class NucleotideAlphabet extends Alphabet {
   type External = Char
   type Internal = Char
-  val terminalSymbol = '$'
+  val sentinel = '$'
   def convert(s: Char) = s
+  def size = 5
 }

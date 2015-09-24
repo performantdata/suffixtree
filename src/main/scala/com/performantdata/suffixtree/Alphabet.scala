@@ -26,8 +26,11 @@ abstract class Alphabet {
   /** The internal representation of a symbol (for use within the suffix tree library). */
   type Internal
 
-  val terminalSymbol: Internal
+  val sentinel: Internal
 
   /** Convert an external representation of a standard symbol to an internal one. */
   def convert(s: External): Internal
+
+  /** Size of the alphabet, including the sentinel. */
+  def size: Int
 }
