@@ -1,4 +1,14 @@
+# IntelliJ
+/.bsp/
+/.idea/
+
+# SBT
+/project/project/
+/project/target/
 /target/
+
 /.cache-main
 /.cache-tests
+
+# JVM
 /hs_err_pid*.log

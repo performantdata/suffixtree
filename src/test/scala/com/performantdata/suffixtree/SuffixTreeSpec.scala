@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015 Performant Data LLC. All rights reserved.
+ * Copyright © 2015,2020 Performant Data LLC. All rights reserved.
  */
 package com.performantdata.suffixtree
 
@@ -62,7 +62,6 @@ class SuffixTreeSpec extends UnitSpec {
   }
 
   it should "use memory?" in {
-    import System.out
     import org.openjdk.jol.info.{ClassLayout,GraphLayout}
     import org.openjdk.jol.util.VMSupport
 
@@ -80,9 +79,9 @@ class SuffixTreeSpec extends UnitSpec {
     tree.terminate()
 
     System.gc()
-    out.println( VMSupport.vmDetails() )
-    out.println( GraphLayout.parseInstance(tree).toFootprint() )
-    out.println( ClassLayout.parseClass(classOf[InternalNode[_]]).toPrintable() )
-    out.println( ClassLayout.parseClass(classOf[TwoKeyOpenHashMap[InternalNode[Char], Char, Node[Char]]]).toPrintable() )
+    println( VMSupport.vmDetails() )
+    println( GraphLayout.parseInstance(tree).toFootprint )
+    println( ClassLayout.parseClass(classOf[InternalNode[_]]).toPrintable() )
+    println( ClassLayout.parseClass(classOf[TwoKeyOpenHashMap[InternalNode[Char], Char, Node[Char]]]).toPrintable() )
   }
 }
